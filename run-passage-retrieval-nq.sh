@@ -28,5 +28,3 @@ done
 #    --output_format dpr --output output.json \
 #    --checkpoint /data/philhoon-relevance/SEAL/SEAL-checkpoint+index.NQ/SEAL.NQ.pt \
 #    --fm_index /data/philhoon-relevance/SEAL/SEAL-checkpoint+index.NQ \
-#    --jobs 75 --progress --device cuda:0 --batch_size 20 \
-#    --beam 15
