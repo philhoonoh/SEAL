@@ -89,17 +89,19 @@ class DprOutputFormatQueryQasIterator(QueryIterator):
     def from_topics(cls, topics_path: str):
         topics = {}
         order = []
-        with open(topics_path) as fin:
-            for id_, instance in enumerate(fin):
-                example = json.loads(instance)
-                query = example['question']
-                answers = example['answers']
-                assert isinstance(answers, list) and isinstance(answers[0], str)
-                topics[id_] = {
-                    "question": query,
-                    "answers": answers,
-                }
-                order.append(id_)
+
+        with open(topics_path, 'r') as f:
+            data = json.load(f)
+
+        for id_, instance in enumerate(data):
+            query = instance['question']
+            answers = instance['answers']
+            assert isinstance(answers, list) and isinstance(answers[0], str)
+            topics[id_] = {
+                "question": query,
+                "answers": answers,
+            }
+            order.append(id_)
         return cls(topics, order)
 
 class KiltTemplateQueryIterator(KiltQueryIterator):
