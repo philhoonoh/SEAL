@@ -18,12 +18,22 @@ from pyserini.output_writer import OutputWriter, TrecWriter, MsMarcoWriter
 
 from seal.retrieval import SEALDocument
 
+# @unique
+# class TopicsFormat(Enum):
+#     DEFAULT = 'default'
+#     KILT = 'kilt'
+#     KILT_TEMPLATE = 'kilt_template'
+#     DPR = 'dpr'
+#     DPR_QAS = 'dpr_qas'
+#     NQ = 'nq'
+
 @unique
 class TopicsFormat(Enum):
     DEFAULT = 'default'
     KILT = 'kilt'
     KILT_TEMPLATE = 'kilt_template'
     DPR = 'dpr'
+    DPR_OUT = 'dpr_out'
     DPR_QAS = 'dpr_qas'
     NQ = 'nq'
     
@@ -70,6 +80,28 @@ class DprQueryQasIterator(QueryIterator):
                 order.append(id_)
         return cls(topics, order)
 
+class DprOutputFormatQueryQasIterator(QueryIterator):
+
+    def get_query(self, id_):
+        return self.topics[id_]['question']
+
+    @classmethod
+    def from_topics(cls, topics_path: str):
+        topics = {}
+        order = []
+        with open(topics_path) as fin:
+            for id_, instance in enumerate(fin):
+                example = json.loads(instance)
+                query = example['question']
+                answers = example['answers']
+                assert isinstance(answers, list) and isinstance(answers[0], str)
+                topics[id_] = {
+                    "question": query,
+                    "answers": answers,
+                }
+                order.append(id_)
+        return cls(topics, order)
+
 class KiltTemplateQueryIterator(KiltQueryIterator):
 
     def get_query(self, id_):
@@ -92,6 +124,18 @@ class NqQueryIterator(QueryIterator):
         return cls(topics, order)
 
     
+# def get_query_iterator(topics_path: str, topics_format: TopicsFormat, queries_path: Optional[str] = None):
+#     mapping = {
+#         TopicsFormat.DEFAULT: DefaultQueryIterator,
+#         TopicsFormat.KILT: KiltQueryIterator,
+#         TopicsFormat.KILT_TEMPLATE: KiltTemplateQueryIterator,
+#         TopicsFormat.DPR: DprQueryIterator,
+#         TopicsFormat.DPR_QAS: DprQueryQasIterator,
+#         TopicsFormat.NQ: NqQueryIterator,
+#     }
+#     return mapping[topics_format].from_topics(topics_path)
+
+
 def get_query_iterator(topics_path: str, topics_format: TopicsFormat, queries_path: Optional[str] = None):
     mapping = {
         TopicsFormat.DEFAULT: DefaultQueryIterator,
@@ -100,6 +144,7 @@ def get_query_iterator(topics_path: str, topics_format: TopicsFormat, queries_pa
         TopicsFormat.DPR: DprQueryIterator,
         TopicsFormat.DPR_QAS: DprQueryQasIterator,
         TopicsFormat.NQ: NqQueryIterator,
+        TopicsFormat.DPR_OUT : DprOutputFormatQueryQasIterator,
     }
     return mapping[topics_format].from_topics(topics_path)
 
