@@ -4,28 +4,21 @@ dataArray=("dev" "test")
 
 for data in ${dataArray[@]}; do
   dataset="${data}.json"
+  output="${data}.json"
 
-  echo "CUDA_VISIBLE_DEVICES=5 python passage_retrieval.py \
-    --model_name_or_path facebook/contriever-msmarco \
-    --passages /data/philhoon-relevance/FiD/open_domain_data/wikipedia_psgs/psgs_w100.tsv \
-    --passages_embeddings "/data/philhoon-relevance/contriever/wikipedia_embeddings/contriever_msmacro/wikipedia_embeddings/*" \
-    --data /data/philhoon-relevance/FiD/open_domain_data/TQA/"$dataset" \
-    --output_dir /data/philhoon-relevance/contriever/TQA/contriever-msmarco \
-    --per_gpu_batch_size 256
+  echo "TOKENIZERS_PARALLELISM=false python -m seal.search \
+    --topics_format dpr_out --topics /data/philhoon-relevance/FiD/open_domain_data/TQA/"$dataset" \
+    --output_format dpr --output /data/philhoon-relevance/SEAL/TQA/"$output" \
+    --checkpoint /data/philhoon-relevance/SEAL/SEAL-checkpoint+index.NQ/SEAL.NQ.pt \
+    --fm_index /data/philhoon-relevance/SEAL/SEAL-checkpoint+index.NQ/NQ.fm_index \
+    --jobs 24 --progress --device cuda:7 --batch_size 32 \
+    --beam 15
   "
-  CUDA_VISIBLE_DEVICES=5 python passage_retrieval.py \
-  --model_name_or_path facebook/contriever-msmarco \
-  --passages /data/philhoon-relevance/FiD/open_domain_data/wikipedia_psgs/psgs_w100.tsv \
-  --passages_embeddings "/data/philhoon-relevance/contriever/wikipedia_embeddings/contriever_msmacro/wikipedia_embeddings/*" \
-  --data /data/philhoon-relevance/FiD/open_domain_data/TQA/"$dataset" \
-  --output_dir /data/philhoon-relevance/contriever/TQA/contriever-msmarco \
-  --per_gpu_batch_size 256
-  
+  TOKENIZERS_PARALLELISM=false python -m seal.search \
+  --topics_format dpr_out --topics /data/philhoon-relevance/FiD/open_domain_data/TQA/"$dataset" \
+  --output_format dpr --output /data/philhoon-relevance/SEAL/TQA/"$output" \
+  --checkpoint /data/philhoon-relevance/SEAL/SEAL-checkpoint+index.NQ/SEAL.NQ.pt \
+  --fm_index /data/philhoon-relevance/SEAL/SEAL-checkpoint+index.NQ/NQ.fm_index \
+  --jobs 24 --progress --device cuda:7 --batch_size 32 \
+  --beam 15
 done
-
-#python passage_retrieval.py \
-#    --model_name_or_path facebook/contriever \
-#    --passages psgs_w100.tsv \
-#    --passages_embeddings "contriever_embeddings/*" \
-#    --data nq_dir/test.json \
-#    --output_dir contriever_nq \
