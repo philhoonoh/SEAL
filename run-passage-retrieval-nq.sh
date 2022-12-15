@@ -3,7 +3,8 @@
 dataArray=("dev" "test")
 
 for data in ${dataArray[@]}; do
-  dataset="${data}.json"
+  dataset="${data}.jsonl"
+  output="${data}.json"
 
   echo "TOKENIZERS_PARALLELISM=false python -m seal.search \
     --topics_format dpr_out --topics /data/philhoon-relevance/FiD/open_domain_data/NQ/"$dataset" \
@@ -21,11 +22,4 @@ for data in ${dataArray[@]}; do
   --jobs 75 --progress --device cuda:1 --batch_size 32 \
   --beam 15
 done
-
-#TOKENIZERS_PARALLELISM=false python -m seal.search \
-#    --topics_format dpr_out --topics /data/philhoon-relevance/FiD/open_domain_data/NQ/dev.json \
-#    --output_format dpr --output output.json \
-#    --checkpoint /data/philhoon-relevance/SEAL/SEAL-checkpoint+index.NQ/SEAL.NQ.pt \
-#    --fm_index /data/philhoon-relevance/SEAL/SEAL-checkpoint+index.NQ \
-#    --jobs 75 --progress --device cuda:0 --batch_size 20 \
-#    --beam 15
+å
