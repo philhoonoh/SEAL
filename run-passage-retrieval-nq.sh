@@ -22,4 +22,4 @@ for data in ${dataArray[@]}; do
   --jobs 75 --progress --device cuda:1 --batch_size 32 \
   --beam 15
 done
-å
+
